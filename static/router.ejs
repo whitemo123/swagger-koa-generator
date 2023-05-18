@@ -1,0 +1,10 @@
+const router = require('koa-router')()
+
+<% routes.forEach(item=>{%>
+// <%= item.summary%>
+router.<%= item.method%>('<%= item.url%>', function (ctx, next) {
+  ctx.body = <%- JSON.stringify(item.res)%>
+})
+<%})%>
+
+module.exports = router

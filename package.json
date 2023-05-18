@@ -1,0 +1,21 @@
+{
+  "name": "swagger-koa-generator",
+  "version": "1.0.0",
+  "description": "根据swagger接口文档生成koa mock服务端代码",
+  "main": "index.js",
+  "author": "Mobai",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "commander": "^10.0.1",
+    "ejs": "^3.1.9",
+    "faker": "5.5.3",
+    "fs-extra": "^11.1.1",
+    "inquirer": "^9.2.3",
+    "moment": "^2.29.4"
+  },
+  "scripts": {
+    "dev": "node index.js create"
+  }
+}
