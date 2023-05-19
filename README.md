@@ -24,3 +24,9 @@ yarn dev
 
 #? Use global prefix(/api)? (Y/n)（接口是否全局/api）
 ```
+
+### 示例(无交互)
+
+```bash
+mock-swagger-koa-generator g -ptest -wE:\testWorkspace -shttp://192.168.1.222:8081/doc.html
+```

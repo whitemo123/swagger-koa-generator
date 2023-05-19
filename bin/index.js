@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // 命令行工具
 import { program } from 'commander';
 // 命令行交互
@@ -38,6 +40,19 @@ program
     ]);
     // 执行逻辑
     const actionClass = new ActionClass(answers);
+    actionClass.generate();
+  });
+
+  //node .\bin\index.js g -ptest1 -wE:\testWorkspace -shttp://192.168.1.222:8081/doc.html
+  program
+  .command('g')
+  .description('Create a new Project Without Input')
+  .option('-p, --projectName <projectName>', 'project name')
+  .option('-w, --workspace <workspace>', 'workspace path')
+  .option('-s, --swaggerUrl <swaggerUrl>', 'swagger url')
+  .action(async (params) => {
+    // 执行逻辑
+    const actionClass = new ActionClass({...params, needApi: true});
     actionClass.generate();
   });
 
