@@ -1,6 +1,6 @@
 {
   "name": "mock-swagger-koa-generator",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "根据swagger接口文档生成koa mock服务端代码",
   "main": "bin/index.js",
   "author": "Mobai",
@@ -25,7 +25,12 @@
     "moment": "^2.29.4"
   },
   "scripts": {
-    "dev": "node ./bin/index.js create"
+    "dev": "node ./bin/index.js create",
+    "prod": "rollup -c"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "rollup": "^3.22.0",
+    "rollup-plugin-terser": "^7.0.2"
+  }
 }

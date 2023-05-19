@@ -5,7 +5,7 @@ const { program } = require('commander');
 // 命令行交互
 const inquirer = require('inquirer');
 // 主要业务逻辑
-const ActionClass = require('../action.js');
+const ActionClass = require('../dist/index.js');
 
 const path = require("path")
 
