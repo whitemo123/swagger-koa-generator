@@ -78,6 +78,9 @@ export function mockCommonData(key, obj) {
     if (key.indexOf('Name') != -1 || key === 'name') {
       return faker.commerce.productName()
     }
+    if (key === 'id') {
+      return "1655757911382560770"
+    }
     return '1'
   } else if (obj.type === 'object' && obj.additionalProperties) {
     return {}

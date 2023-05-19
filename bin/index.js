@@ -3,7 +3,7 @@ import { program } from 'commander';
 // 命令行交互
 import inquirer from 'inquirer';
 // 主要业务逻辑
-import ActionClass from './action.js';
+import ActionClass from '../action.js';
 
 program
   .command('create')

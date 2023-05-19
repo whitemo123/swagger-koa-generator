@@ -6,7 +6,9 @@ import { get } from "./utils/httpUtil.js";
 import { fileExists } from "./utils/fileUtil.js";
 import fs from "fs-extra";
 
-import { getResponse } from "./utils/core.js"
+import beautify from "js-beautify";
+
+import { getResponse } from "./utils/core.js";
 
 // 获取当前目录
 const currentDir = process.cwd();
@@ -85,11 +87,17 @@ export default class ActionClass {
    * @param {*} schemas 数据结构集合
    * @param {*} routes controller集合
    */
-  async #generateModule (moduleName, schemas, routes) {
-    return new Promise(async resolve => {
-      await this.#renderFile(`${currentDir}/static/router.ejs`, `${this.#option.workspace}/${this.#option.projectName}/routes/${moduleName}/index.js`, {routes})
-      resolve(null)
-    })
+  async #generateModule(moduleName, schemas, routes) {
+    return new Promise(async (resolve) => {
+      await this.#renderFile(
+        `${currentDir}/static/router.ejs`,
+        `${this.#option.workspace}/${
+          this.#option.projectName
+        }/routes/${moduleName}/index.js`,
+        { routes }
+      );
+      resolve(null);
+    });
   }
 
   /**
@@ -97,49 +105,60 @@ export default class ActionClass {
    * @param {*} item
    * @returns
    */
-  #getHttpData (item) {
+  #getHttpData(item) {
     return {
-      method: item.get ? 'get' : item.post ? 'post' : item.put ? 'put' : 'delete',
-      data: item.get || item.post || item.put || item.delete
-    }
+      method: item.get
+        ? "get"
+        : item.post
+        ? "post"
+        : item.put
+        ? "put"
+        : "delete",
+      data: item.get || item.post || item.put || item.delete,
+    };
   }
 
   /**
    * 创建模块文件
    * @param {string} moduleName 模块名
    */
-  async #createModule (moduleName) {
-    this.#log("开始创建" + moduleName + "模块文件")
-    return new Promise(async resolve => {
+  async #createModule(moduleName) {
+    this.#log("开始创建" + moduleName + "模块文件");
+    return new Promise(async (resolve) => {
       try {
-        const moduleInfo = await get(`${this.#option.swaggerUrl}/v3/api-docs/${moduleName}`)
+        const moduleInfo = await get(
+          `${this.#option.swaggerUrl}/v3/api-docs/${moduleName}`
+        );
         // === controller集合处理 ===
         let paths = moduleInfo.paths;
         let schemas = moduleInfo.components.schemas;
-        const routes = []
+        const routes = [];
         for (let key in paths) {
-          const data = this.#getHttpData(paths[key])['data'];
-          let url = ''
+          const data = this.#getHttpData(paths[key])["data"];
+          let url = "";
           if (key.indexOf("{") != -1) {
-            url = key.replace(/{([^}]+)}/g, ':$1');
+            url = key.replace(/{([^}]+)}/g, ":$1");
           } else {
-            url = key
+            url = key;
           }
           routes.push({
             url: url,
-            method: this.#getHttpData(paths[key])['method'],
-            summary: `${data['tags'][0]}${data['summary']}`,
-            res: getResponse((data?.responses['200']?.content['*/*']?.schema?.$ref || ''), schemas)
-          })
+            method: this.#getHttpData(paths[key])["method"],
+            summary: `${data["tags"][0]}${data["summary"]}`,
+            res: getResponse(
+              data?.responses["200"]?.content["*/*"]?.schema?.$ref || "",
+              schemas
+            ),
+          });
         }
         // =========================
-        await this.#generateModule(moduleName, {}, routes)
-        this.#log("完成创建" + moduleName + "模块文件")
-        resolve(null)
+        await this.#generateModule(moduleName, {}, routes);
+        this.#log("完成创建" + moduleName + "模块文件");
+        resolve(null);
       } catch (e) {
-        throw new Error(e)
+        throw new Error(e);
       }
-    })
+    });
   }
 
   /**
@@ -147,13 +166,13 @@ export default class ActionClass {
    */
   async #createModulesFile() {
     this.#log("开始创建模块文件");
-    let promiseArr = this.#modules.map(item => this.#createModule(item))
-    return new Promise(resolve => {
-      Promise.all(promiseArr).then(e => {
+    let promiseArr = this.#modules.map((item) => this.#createModule(item));
+    return new Promise((resolve) => {
+      Promise.all(promiseArr).then((e) => {
         this.#log("完成创建模块文件");
-        resolve(null)
-      })
-    })
+        resolve(null);
+      });
+    });
   }
 
   /**
@@ -169,8 +188,11 @@ export default class ActionClass {
         if (err) {
           throw new Error(err);
         }
-        fs.createFileSync(outPath)
-        const res = fs.writeFileSync(outPath, str);
+        fs.createFileSync(outPath);
+        const res = fs.writeFileSync(
+          outPath,
+          beautify.js(str, { indent_size: 2, space_in_empty_paren: true })
+        );
         if (res) {
           throw new Error(res);
         }
