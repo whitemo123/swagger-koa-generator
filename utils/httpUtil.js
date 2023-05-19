@@ -1,4 +1,4 @@
-import axios from "axios";
+const axios = require("axios");
 
 const instance = axios.create({
 
@@ -16,8 +16,6 @@ const request = (config) => {
 
 const get = (url, params) => request({url, params})
 
-export {
+module.exports = {
   get
 }
-
-export default request

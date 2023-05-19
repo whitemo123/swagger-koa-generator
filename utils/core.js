@@ -1,12 +1,12 @@
-import faker from "faker"
-import moment from "moment"
+const faker = require("faker")
+const moment = require("moment")
 
 /**
  * 获取响应内容
  * @param {*} ref 对象key
  * @param {*} schemas 对象集合
  */
-export function getResponse(ref, schemas) {
+function getResponse(ref, schemas) {
   if (!ref || !schemas) {
     return null
   }
@@ -51,7 +51,7 @@ export function getResponse(ref, schemas) {
  * @param {*} obj 对象
  * @returns
  */
-export function mockCommonData(key, obj) {
+function mockCommonData(key, obj) {
   if (obj.type === 'integer' && key !== 'id') {
     // ==分页参数==
     if (key === 'page') {
@@ -93,7 +93,7 @@ export function mockCommonData(key, obj) {
  * @param {object} schemas schemas
  * @returns
  */
-export function getArrayResponse(ref, schemas) {
+function getArrayResponse(ref, schemas) {
   const refArr = ref.split('/')
   const key = refArr[refArr.length - 1]
   let obj = JSON.parse(JSON.stringify(schemas[key]))
@@ -106,4 +106,10 @@ export function getArrayResponse(ref, schemas) {
     result[key] = mockCommonData(key, item)
   }
   return [result]
+}
+
+module.exports = {
+  getResponse,
+  mockCommonData,
+  getArrayResponse
 }

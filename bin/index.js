@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 // 命令行工具
-import { program } from 'commander';
+const { program } = require('commander');
 // 命令行交互
-import inquirer from 'inquirer';
+const inquirer = require('inquirer');
 // 主要业务逻辑
-import ActionClass from '../action.js';
+const ActionClass = require('../action.js');
+
+const path = require("path")
 
 program
   .command('create')
@@ -39,7 +41,7 @@ program
       }
     ]);
     // 执行逻辑
-    const actionClass = new ActionClass(answers);
+    const actionClass = new ActionClass(answers, path.join(__dirname, "../"));
     actionClass.generate();
   });
 
@@ -52,7 +54,7 @@ program
   .option('-s, --swaggerUrl <swaggerUrl>', 'swagger url')
   .action(async (params) => {
     // 执行逻辑
-    const actionClass = new ActionClass({...params, needApi: true});
+    const actionClass = new ActionClass({...params, needApi: true}, path.join(__dirname, "../"));
     actionClass.generate();
   });
 

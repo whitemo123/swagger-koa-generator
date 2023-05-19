@@ -1,22 +1,26 @@
 {
   "name": "mock-swagger-koa-generator",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "根据swagger接口文档生成koa mock服务端代码",
   "main": "bin/index.js",
   "author": "Mobai",
   "license": "MIT",
-  "type": "module",
   "bin": {
     "mock-swagger-koa-generator": "./bin/index.js"
   },
-  "keywords": ["mock-swagger-koa-generator", "mock", "koa", "swagger"],
+  "keywords": [
+    "mock-swagger-koa-generator",
+    "mock",
+    "koa",
+    "swagger"
+  ],
   "dependencies": {
     "axios": "^1.4.0",
     "commander": "^10.0.1",
     "ejs": "^3.1.9",
     "faker": "5.5.3",
     "fs-extra": "^11.1.1",
-    "inquirer": "^9.2.3",
+    "inquirer": "8.2.5",
     "js-beautify": "^1.14.7",
     "moment": "^2.29.4"
   },

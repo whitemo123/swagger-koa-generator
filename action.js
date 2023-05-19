@@ -1,27 +1,26 @@
 // ejs
-import ejs from "ejs";
+const ejs = require("ejs");
 // http工具
-import { get } from "./utils/httpUtil.js";
+const { get } = require("./utils/httpUtil.js");
 // 文件函数
-import { fileExists } from "./utils/fileUtil.js";
-import fs from "fs-extra";
+const { fileExists } = require("./utils/fileUtil.js");
+const fs = require("fs-extra");
 
-import beautify from "js-beautify";
+const beautify = require("js-beautify");
 
-import { getResponse } from "./utils/core.js";
+const { getResponse } = require("./utils/core.js");
 
-// 获取当前目录
-const currentDir = process.cwd();
-
-export default class ActionClass {
+class ActionClass {
   // 配置对象
   #option = {};
   // 模块数组
   #modules = [];
+  // 当前路径
+  #currentDir = "";
   /**
    * 初始化
    */
-  constructor(data) {
+  constructor(data, currentDir) {
     if (!data.projectName) {
       throw new Error("please input your projectName");
     }
@@ -34,9 +33,13 @@ export default class ActionClass {
     if (!data.swaggerUrl) {
       throw new Error("please input your swaggerUrl");
     }
+    if (!currentDir) {
+      throw new Error("currentDir is null");
+    }
     // 处理swagger url
     data.swaggerUrl = data.swaggerUrl.replace("/doc.html", "");
     this.#option = data;
+    this.#currentDir = currentDir;
   }
 
   /**
@@ -68,12 +71,12 @@ export default class ActionClass {
     this.#log("开始创建项目文件");
     // 创建项目结构
     await fs.copySync(
-      currentDir + "/templates",
+      `${this.#currentDir}templates`,
       `${this.#option.workspace}/${this.#option.projectName}`
     );
     // 生成app.js文件
     await this.#renderFile(
-      currentDir + "/static/app.ejs",
+      `${this.#currentDir}static/app.ejs`,
       `${this.#option.workspace}/${this.#option.projectName}/app.js`,
       { needApi: this.#option.needApi }
     );
@@ -90,7 +93,7 @@ export default class ActionClass {
   async #generateModule(moduleName, schemas, routes) {
     return new Promise(async (resolve) => {
       await this.#renderFile(
-        `${currentDir}/static/router.ejs`,
+        `${this.#currentDir}static/router.ejs`,
         `${this.#option.workspace}/${
           this.#option.projectName
         }/routes/${moduleName}/index.js`,
@@ -221,3 +224,5 @@ export default class ActionClass {
     await this.#createModulesFile();
   }
 }
+
+module.exports = ActionClass;
