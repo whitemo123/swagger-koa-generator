@@ -1,6 +1,9 @@
 const faker = require("faker")
 const moment = require("moment")
 
+// const { schemas, ref } = require("../test/data.js")
+// console.log(JSON.stringify(getResponse(ref, schemas)))
+
 /**
  * 获取响应内容
  * @param {*} ref 对象key
@@ -10,7 +13,6 @@ function getResponse(ref, schemas) {
   if (!ref || !schemas) {
     return null
   }
-
   function mockData(obj) {
     let result = {}
     for (const key in obj) {
@@ -52,7 +54,7 @@ function getResponse(ref, schemas) {
  * @returns
  */
 function mockCommonData(key, obj) {
-  if (obj.type === 'integer' && key !== 'id') {
+  if ((obj.type === 'integer' && key !== 'id') || obj.type === 'number') {
     // ==分页参数==
     if (key === 'page') {
       return 1
@@ -103,7 +105,14 @@ function getArrayResponse(ref, schemas) {
   const result = {}
   for (const key in obj.properties) {
     let item = obj.properties[key]
-    result[key] = mockCommonData(key, item)
+    // 如果类型是数组
+    if (item.type === 'array') {
+      if (item.items.$ref) {
+        result[key] = getArrayResponse(item.items.$ref, schemas)
+      }
+    } else {
+      result[key] = mockCommonData(key, item)
+    }
   }
   return [result]
 }
