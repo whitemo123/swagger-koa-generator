@@ -107,7 +107,9 @@ function getArrayResponse(ref, schemas) {
     let item = obj.properties[key]
     // 如果类型是数组
     if (item.type === 'array') {
-      if (item.items.$ref) {
+      if (key === 'children') {
+        result[key] = []
+      } else if (item.items.$ref) {
         result[key] = getArrayResponse(item.items.$ref, schemas)
       }
     } else {
