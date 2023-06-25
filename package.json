@@ -1,6 +1,6 @@
 {
   "name": "mock-swagger-koa-generator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "根据swagger接口文档生成koa mock服务端代码",
   "main": "bin/index.js",
   "author": "Mobai",
