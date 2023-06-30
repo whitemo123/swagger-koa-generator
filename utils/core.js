@@ -1,5 +1,7 @@
 const faker = require("faker")
 const moment = require("moment")
+const SnowFlake = require("./snowflake.js")
+const snowflake = new SnowFlake(1n, 1n, 0n)
 
 // const { schemas, ref } = require("../test/data.js")
 // console.log(JSON.stringify(getResponse(ref, schemas)))
@@ -81,7 +83,7 @@ function mockCommonData(key, obj) {
       return faker.commerce.productName()
     }
     if (key === 'id') {
-      return "1655757911382560770"
+      return snowflake.nextId().toString()
     }
     return '1'
   } else if (obj.type === 'object' && obj.additionalProperties) {
@@ -119,8 +121,28 @@ function getArrayResponse(ref, schemas, fKey = "children") {
   return [result]
 }
 
+/**
+ * 将接口进行分组
+ * @param paths 接口对象集合
+ * @returns {*}
+ */
+function groupArrByPath(paths) {
+  let result = {}
+  for (let path in paths) {
+    const tagName = path.split('/')[3]
+    // 接口对象
+    const pathItem = paths[path];
+    if (!result[tagName]) {
+      result[tagName] = []
+    }
+    result[tagName].push({url: path, item: pathItem})
+  }
+  return result;
+}
+
 module.exports = {
   getResponse,
   mockCommonData,
-  getArrayResponse
+  getArrayResponse,
+  groupArrByPath
 }

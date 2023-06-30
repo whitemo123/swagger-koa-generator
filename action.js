@@ -8,7 +8,7 @@ const fs = require("fs-extra");
 
 const beautify = require("js-beautify");
 
-const { getResponse } = require("./utils/core.js");
+const { getResponse, groupArrByPath } = require("./utils/core.js");
 
 class ActionClass {
   // 配置对象
@@ -87,16 +87,17 @@ class ActionClass {
   /**
    * 生成模块代码
    * @param {*} moduleName 模块名
+   * @param {*} tagName 分类
    * @param {*} schemas 数据结构集合
    * @param {*} routes controller集合
    */
-  async #generateModule(moduleName, schemas, routes) {
+  async #generateModule(moduleName, tagName, schemas, routes) {
     return new Promise(async (resolve) => {
       await this.#renderFile(
         `${this.#currentDir}static/router.ejs`,
         `${this.#option.workspace}/${
           this.#option.projectName
-        }/routes/${moduleName}/index.js`,
+        }/routes/${moduleName}/${tagName}.js`,
         { routes }
       );
       resolve(null);
@@ -127,6 +128,8 @@ class ActionClass {
    */
   async #createModule(moduleName) {
     this.#log("开始创建" + moduleName + "模块文件");
+    // 创建文件夹
+    await fs.mkdirsSync(`${this.#option.workspace}/${this.#option.projectName}/routes/${moduleName}`)
     return new Promise(async (resolve) => {
       try {
         const moduleInfo = await get(
@@ -134,28 +137,34 @@ class ActionClass {
         );
         // === controller集合处理 ===
         let paths = moduleInfo.paths;
-        let schemas = moduleInfo.components.schemas;
-        const routes = [];
-        for (let key in paths) {
-          const data = this.#getHttpData(paths[key])["data"];
-          let url = "";
-          if (key.indexOf("{") != -1) {
-            url = key.replace(/{([^}]+)}/g, ":$1");
-          } else {
-            url = key;
+        let pathGroup = groupArrByPath(paths)
+        for (let pathGroupKey in pathGroup) {
+          paths = pathGroup[pathGroupKey]
+          let schemas = moduleInfo.components.schemas;
+          const routes = [];
+          for (let i = 0; i < paths.length; i++) {
+            const pathsItem = paths[i];
+            const data = this.#getHttpData(pathsItem['item'])["data"];
+            const key = pathsItem.url;
+            let url = "";
+            if (key.indexOf("{") != -1) {
+              url = key.replace(/{([^}]+)}/g, ":$1");
+            } else {
+              url = key;
+            }
+            routes.push({
+              url: url,
+              method: this.#getHttpData(pathsItem['item'])["method"],
+              summary: `${data["tags"][0]}${data["summary"]}`,
+              res: getResponse(
+                data?.responses["200"]?.content["*/*"]?.schema?.$ref || "",
+                schemas
+              ),
+            });
           }
-          routes.push({
-            url: url,
-            method: this.#getHttpData(paths[key])["method"],
-            summary: `${data["tags"][0]}${data["summary"]}`,
-            res: getResponse(
-              data?.responses["200"]?.content["*/*"]?.schema?.$ref || "",
-              schemas
-            ),
-          });
+          await this.#generateModule(moduleName, pathGroupKey,  {}, routes);
         }
         // =========================
-        await this.#generateModule(moduleName, {}, routes);
         this.#log("完成创建" + moduleName + "模块文件");
         resolve(null);
       } catch (e) {
