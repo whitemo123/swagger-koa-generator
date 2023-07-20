@@ -115,7 +115,11 @@ function getArrayResponse(ref, schemas, fKey = "children") {
         result[key] = getArrayResponse(item.items.$ref, schemas, key)
       }
     } else {
-      result[key] = mockCommonData(key, item)
+      if (item.$ref) {
+        result[key] = getResponse(item.$ref, schemas)
+      } else {
+        result[key] = mockCommonData(key, item)
+      }
     }
   }
   return [result]
